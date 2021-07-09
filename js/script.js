@@ -250,44 +250,54 @@ window.addEventListener('DOMContentLoaded', () => {
             `;
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+            const formData = new FormData(form);
 
             // скрипт для отправки данных в обычном формате на сервер
 
-            /* если мы используем FormData для отправки данных на сервер в связке с XMLHttpRequest, то для запроса заголовок не нужен, в FormData он уже есть автоматически!!!!! */
-
-            // request.setRequestHeader('Content-type', 'multipart/form-data'); 
-
-            // const formData = new FormData(form);
-            // request.send(formData);
-            //
+            /* fetch('server.php', {
+                method: 'POST',
+                // headers: {
+                //     'Content-type': 'multipart/form-data'
+                // },
+                body: formData
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);
+                showModalThanks(message.send);
+                statusMessage.remove();
+            }).catch(() => {
+                showModalThanks(message.error);
+            }).finally(() => {
+                form.reset();
+            });
+            */
 
             // скрипт для отправки данных в формате JSON на сервер, нам необходимо перевести данные в объект!
-
-            request.setRequestHeader('Content-type', 'application/json'); 
-            const formData = new FormData(form);
 
             const object = {};
             formData.forEach(function(value, key) {
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object);
-
-            request.send(json);
-            // 
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showModalThanks(message.send);
-                    form.reset();
-                    statusMessage.remove();
-                } else {
-                    showModalThanks(message.error);
-                }
+            fetch('server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object)
+            })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);
+                showModalThanks(message.send);
+                statusMessage.remove();
+            }).catch(() => {
+                showModalThanks(message.error);
+            }).finally(() => {
+                form.reset();
             });
+            // 
         });
     }
 
@@ -313,7 +323,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-
-    
 
 });
