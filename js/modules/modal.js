@@ -1,29 +1,33 @@
-function modal() {
-    // modal window
+function activateModal(modalSelector, modalTimerId) {
+    const modal = document.querySelector(modalSelector);
+    modal.classList.add('show', 'fade');
+    modal.classList.remove('hide');
 
-    const modal = document.querySelector('.modal'),
-        btnActiveModal = document.querySelectorAll('[data-modal]');
+    document.body.style.overflow = 'hidden'; /* отключает прокрутку страницы */
 
-    function activateModal() {
-        modal.classList.add('show', 'fade');
-        modal.classList.remove('hide');
-
-        document.body.style.overflow = 'hidden'; /* отключает прокрутку страницы */
-
+    if (modalTimerId) {
         clearInterval(modalTimerId);
     }
+}
 
-    function hideModal() {
-        modal.classList.add('hide');
-        modal.classList.remove('show', 'fade');
+function hideModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+    modal.classList.add('hide');
+    modal.classList.remove('show', 'fade');
 
-        document.body.style.overflow = ''; /* включает прокрутку страницы */
-    }
+    document.body.style.overflow = ''; /* включает прокрутку страницы */
+}
+
+function modal(triggerSelector, modalSelector, modalTimerId) {
+    // modal window
+
+    const modal = document.querySelector(modalSelector),
+        btnActiveModal = document.querySelectorAll(triggerSelector);
 
     btnActiveModal.forEach(item => {
         item.addEventListener('click', (event) => {
             event.preventDefault();
-            activateModal();
+            activateModal(modalSelector, modalTimerId);
         });
     });
 
@@ -31,22 +35,21 @@ function modal() {
     /* функционал, закрывающий модальное окно по клику в любую область экрана, кроме самого окна */
     modal.addEventListener('click', (e) => {
         if (e.target === modal || e.target.getAttribute('data-close') == '') {
-            hideModal();
+            hideModal(modalSelector);
         }
     });
 
     /* функционал, закрывающий модальное окно при нажатии на кнопку esc */
     document.addEventListener('keydown', (e) => {
         if (e.code === "Escape") {
-            hideModal();
+            hideModal(modalSelector);
         }
     });
 
-    const modalTimerId = setTimeout(activateModal, 50000);
 
     function showMyModalByScroll() {
         if (document.documentElement.clientHeight + window.pageYOffset >= document.documentElement.scrollHeight) {
-            activateModal();
+            activateModal(modalSelector, modalTimerId);
             window.removeEventListener('scroll', showMyModalByScroll);
         }
     }
@@ -54,4 +57,6 @@ function modal() {
     window.addEventListener('scroll', showMyModalByScroll);
 }
 
-module.exports = modal;
+export default modal;
+export {activateModal};
+export {hideModal};
